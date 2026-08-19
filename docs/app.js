@@ -14,7 +14,7 @@ import {
   limit,
   writeBatch,
   serverTimestamp,
-} from "./firebase.js?v=7";
+} from "./firebase.js?v=8";
 
 const ART_SIZE = 128;
 const ART_PIXELS = ART_SIZE * ART_SIZE;
@@ -322,17 +322,19 @@ wall.addEventListener("click", async (e) => {
 });
 function render(entry) {
   empty.hidden = true;
+  const wrapper = document.createElement("div");
   const c = document.createElement("canvas");
   const values = JSON.parse(entry.pixels);
   const size = Math.round(Math.sqrt(values.length));
   c.width = c.height = size;
-  c.className = "entry";
-  c.style.width = `${size}px`;
-  c.style.height = `${size}px`;
-  c.style.left = `${entry.x}px`;
-  c.style.top = `${entry.y}px`;
+  wrapper.className = "entry";
+  wrapper.style.width = `${size}px`;
+  wrapper.style.height = `${size}px`;
+  wrapper.style.left = `${entry.x}px`;
+  wrapper.style.top = `${entry.y}px`;
   const d = new Date(entry.created_at).toLocaleString("de-DE");
-  c.dataset.label = `${entry.name} · ${d}`;
+  wrapper.dataset.label = entry.name;
+  wrapper.title = `${entry.name} · ${d}`;
   const cx = c.getContext("2d");
   values.forEach((v, i) => {
     if (v) {
@@ -340,7 +342,8 @@ function render(entry) {
       cx.fillRect(i % size, Math.floor(i / size), 1, 1);
     }
   });
-  wall.append(c);
+  wrapper.append(c);
+  wall.append(wrapper);
 }
 function notify(message) {
   toast.textContent = message;
