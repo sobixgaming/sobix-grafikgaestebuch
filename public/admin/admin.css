@@ -150,6 +150,54 @@ button {
   border: 1px solid #292929;
   border-radius: 12px;
 }
+.logGroups {
+  display: grid;
+  gap: 12px;
+}
+.logGroup {
+  overflow: hidden;
+  border: 1px solid #3f321d;
+  border-radius: 12px;
+  background: #090807;
+}
+.logGroup[open] {
+  border-color: #8f692d;
+  box-shadow: 0 0 16px #d0a03e14;
+}
+.logGroup summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 16px 18px;
+  cursor: pointer;
+  color: #f4d794;
+  background: linear-gradient(100deg, #171106, #0b0a08);
+  list-style: none;
+}
+.logGroup summary::-webkit-details-marker {
+  display: none;
+}
+.logGroup summary::before {
+  content: "＋";
+  color: #d2a650;
+}
+.logGroup[open] summary::before {
+  content: "−";
+}
+.logGroup summary strong {
+  margin-right: auto;
+  font-size: 18px;
+}
+.logGroup summary span {
+  color: #9f947f;
+  font-size: 12px;
+}
+.logGroup .tableWrap {
+  border: 0;
+  border-top: 1px solid #3f321d;
+  border-radius: 0;
+}
 table {
   width: 100%;
   border-collapse: collapse;
