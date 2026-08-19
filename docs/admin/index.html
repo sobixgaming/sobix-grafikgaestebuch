@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>Admin · Sobix Grafik-Gästebuch</title>
-    <link rel="stylesheet" href="admin.css" />
+    <link rel="stylesheet" href="admin.css?v=11" />
   </head>
   <body>
     <main>
@@ -33,6 +33,16 @@
         <div class="stats">
           <strong id="count">0</strong><span>protokollierte Einträge</span>
         </div>
+        <section class="archiveSection">
+          <div class="sectionHead">
+            <div>
+              <p class="eyebrow">Monatliche Sicherungen</p>
+              <h2>Wand-Archiv</h2>
+            </div>
+            <span id="archiveCount">0 Archive</span>
+          </div>
+          <div id="archiveGrid" class="archiveGrid"></div>
+        </section>
         <div class="tableWrap">
           <table>
             <thead>
@@ -51,6 +61,6 @@
       </section>
       <p id="message"></p>
     </main>
-    <script type="module" src="admin.js?v=6"></script>
+    <script type="module" src="admin.js?v=11"></script>
   </body>
 </html>
