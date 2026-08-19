@@ -20,7 +20,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyDosKdnjV_NgX2Ypi0jTeYAJIBrNn8DRvQ",
+  apiKey: "AIzaSyDosKdnjV_NqX2Ypi0jTeYAJIBrNn8DRvQ",
   authDomain: "sobix-grafik-gaestebuch.firebaseapp.com",
   projectId: "sobix-grafik-gaestebuch",
   storageBucket: "sobix-grafik-gaestebuch.firebasestorage.app",
