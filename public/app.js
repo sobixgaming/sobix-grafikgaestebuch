@@ -14,7 +14,7 @@ import {
   limit,
   writeBatch,
   serverTimestamp,
-} from "./firebase.js?v=8";
+} from "./firebase.js?v=10";
 
 const ART_SIZE = 128;
 const ART_PIXELS = ART_SIZE * ART_SIZE;
@@ -137,7 +137,7 @@ brushSizeInput.addEventListener("input", () => {
 onAuthStateChanged(auth, (user) => {
   currentUser = user;
   document.querySelector("#userStatus").textContent = user
-    ? user.displayName || user.email
+    ? `Angemeldet als: ${user.displayName || user.email}`
     : "Nicht angemeldet";
   document.querySelector("#logout").hidden = !user;
 });
