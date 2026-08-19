@@ -1,0 +1,142 @@
+:root {
+  color-scheme: dark;
+  font-family: Inter, system-ui, sans-serif;
+  background: #050505;
+  color: #eee;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+}
+main {
+  max-width: 1400px;
+  margin: auto;
+  padding: 28px;
+}
+header,
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+h1,
+h2,
+p {
+  margin: 0;
+}
+.eyebrow {
+  color: #ff5c16;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+h1 {
+  font-size: clamp(28px, 5vw, 54px);
+  margin-top: 5px;
+  background: linear-gradient(100deg, #fff, #8fe7ff, #ad7cff, #ff4d9d, #ffc45d);
+  color: transparent;
+  background-clip: text;
+  -webkit-background-clip: text;
+}
+a {
+  color: #aaa;
+}
+section {
+  margin-top: 34px;
+}
+#login,
+#denied {
+  max-width: 520px;
+  border: 1px solid #292929;
+  background: #0c0c0c;
+  border-radius: 14px;
+  padding: 28px;
+}
+#login p,
+#denied p {
+  color: #999;
+  margin: 8px 0 20px;
+}
+button {
+  border: 1px solid #444;
+  background: #181818;
+  color: #fff;
+  border-radius: 8px;
+  padding: 11px 15px;
+  cursor: pointer;
+}
+#loginButton {
+  background: #fff;
+  color: #111;
+  font-weight: 700;
+}
+.stats {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin: 24px 0;
+}
+.stats strong {
+  font-size: 40px;
+}
+.stats span {
+  color: #888;
+}
+.tableWrap {
+  overflow: auto;
+  border: 1px solid #292929;
+  border-radius: 12px;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #0b0b0b;
+}
+th,
+td {
+  text-align: left;
+  padding: 12px;
+  border-bottom: 1px solid #242424;
+  white-space: nowrap;
+  font-size: 13px;
+}
+th {
+  color: #888;
+  font-size: 11px;
+  text-transform: uppercase;
+}
+td canvas {
+  width: 64px;
+  height: 64px;
+  image-rendering: pixelated;
+  background: #000;
+}
+.account {
+  display: grid;
+}
+.account small {
+  color: #777;
+}
+#message {
+  margin-top: 20px;
+  color: #ff8060;
+}
+@media (max-width: 600px) {
+  main {
+    padding: 18px;
+  }
+  header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .toolbar {
+    align-items: flex-start;
+  }
+  .tableWrap {
+    margin-inline: -18px;
+    border-radius: 0;
+  }
+}
