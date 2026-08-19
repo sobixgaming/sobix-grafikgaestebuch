@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <meta
       name="description"
-      content="Ein gemeinsames Grafikgästebuch aus 64×64 Pixelbildern"
+      content="Ein gemeinsames Grafikgästebuch aus 128×128 Pixelbildern"
     />
     <title>Sobix Grafik-Gästebuch</title>
     <link rel="stylesheet" href="style.css" />
@@ -37,7 +37,7 @@
         <div class="modalHead">
           <div>
             <h2>Dein Eintrag</h2>
-            <p>Zeichne ein Bild mit 64 × 64 Pixeln.</p>
+            <p>Zeichne ein Bild mit 128 × 128 Pixeln.</p>
           </div>
           <button value="cancel" class="icon" aria-label="Schließen">×</button>
         </div>
@@ -49,32 +49,55 @@
             autocomplete="nickname"
             placeholder="Dein Name"
         /></label>
-        <div class="tools">
-          <input
-            id="color"
-            type="color"
-            value="#ff4d00"
-            aria-label="Farbe"
-          /><button type="button" data-tool="pen" class="active">Stift</button
-          ><button type="button" data-tool="eraser">Radierer</button
-          ><button type="button" data-tool="fill">Füllen</button
-          ><button type="button" id="undo" disabled>Rückgängig</button
-          ><button type="button" id="clear">Leeren</button>
+        <div class="toolRows">
+          <div class="toolRow primaryTools">
+            <label class="colorControl" title="Farbe wählen"
+              ><span>Farbe</span
+              ><input
+                id="color"
+                type="color"
+                value="#ff4d00"
+                aria-label="Farbe"
+            /></label>
+            <button type="button" data-tool="pen" class="active">
+              <span class="toolIcon" aria-hidden="true">✎</span> Stift
+            </button>
+            <button type="button" data-tool="eraser">
+              <span class="toolIcon" aria-hidden="true">▱</span> Radierer
+            </button>
+            <button type="button" data-tool="fill">
+              <span class="toolIcon" aria-hidden="true">▣</span> Füllen
+            </button>
+          </div>
+          <div class="toolRow secondaryTools">
+            <label class="brushControl" for="brushSize">
+              <span>Pinselgröße</span>
+              <input id="brushSize" type="range" min="1" max="10" value="1" />
+              <output id="brushValue" for="brushSize">1 px</output>
+            </label>
+            <button type="button" id="undo" disabled>
+              <span class="toolIcon" aria-hidden="true">↶</span> Rückgängig
+            </button>
+            <button type="button" id="clear">
+              <span class="toolIcon" aria-hidden="true">✕</span> Alles löschen
+            </button>
+          </div>
         </div>
-        <canvas
-          id="pixelCanvas"
-          width="64"
-          height="64"
-          aria-label="Pixel-Editor"
-        ></canvas>
+        <div class="canvasFrame">
+          <canvas
+            id="pixelCanvas"
+            width="128"
+            height="128"
+            aria-label="Pixel-Editor"
+          ></canvas>
+        </div>
         <p class="hint">
-          Zeichnen und danach einen freien Platz auf der Fläche wählen.
+          Zeichne dein Kunstwerk mit den vorhandenen Tools und klicke
+          anschließend auf Platzieren.
         </p>
         <div class="actions">
           <button value="cancel">Abbrechen</button
-          ><button type="button" id="place" class="primary">
-            Auf Fläche platzieren
-          </button>
+          ><button type="button" id="place" class="primary">Platzieren</button>
         </div>
       </form>
     </dialog>
@@ -83,6 +106,6 @@
       ><button id="cancelPlace">Abbrechen</button>
     </div>
     <div id="toast" role="status"></div>
-    <script type="module" src="app.js?v=5"></script>
+    <script type="module" src="app.js?v=6"></script>
   </body>
 </html>
