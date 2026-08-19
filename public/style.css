@@ -118,16 +118,44 @@ button:hover,
   position: fixed;
   inset: 92px 0 0;
   overflow: auto;
-  background: #050505;
+  background-color: #080603;
+  background-image:
+    radial-gradient(circle at 15% 20%, #6f4d181f 0 2px, transparent 3px),
+    radial-gradient(circle at 85% 75%, #d1a64617 0 1px, transparent 2px),
+    repeating-linear-gradient(45deg, transparent 0 28px, #b98a3210 29px 30px),
+    linear-gradient(135deg, #030303, #171005 48%, #050403);
+  background-size:
+    auto,
+    auto,
+    42px 42px,
+    auto;
 }
 #wall {
   position: relative;
   width: 1920px;
   height: 1080px;
   background-color: #000;
-  background-image: radial-gradient(#1b1b1b 1px, transparent 1px);
+  background-image:
+    radial-gradient(#242015 1px, transparent 1px),
+    linear-gradient(135deg, #050505, #000 55%, #080603);
   background-size: 32px 32px;
-  box-shadow: 0 0 0 1px #222;
+  box-shadow:
+    0 0 0 2px #3a2a11,
+    0 0 0 6px #c69b45,
+    0 0 0 9px #4c3515,
+    0 0 0 12px #17100a,
+    0 18px 70px #000;
+}
+#wall::before {
+  content: "";
+  position: absolute;
+  z-index: 15;
+  inset: 12px;
+  pointer-events: none;
+  border: 2px solid #b98a3266;
+  box-shadow:
+    inset 0 0 0 2px #090704,
+    inset 0 0 28px #c7983517;
 }
 #wall.fit-screen {
   position: absolute;
@@ -141,8 +169,6 @@ button:hover,
 .entry,
 .placement-preview {
   position: absolute;
-  width: 64px;
-  height: 64px;
   image-rendering: pixelated;
 }
 .entry {
@@ -157,7 +183,7 @@ button:hover,
   display: none;
   position: absolute;
   left: 0;
-  bottom: 70px;
+  bottom: calc(100% + 6px);
   white-space: nowrap;
   background: #fff;
   color: #000;
@@ -168,6 +194,8 @@ button:hover,
   display: block;
 }
 .placement-preview {
+  width: 128px;
+  height: 128px;
   z-index: 10;
   pointer-events: none;
   opacity: 0.72;
@@ -182,13 +210,16 @@ button:hover,
   pointer-events: none;
 }
 dialog {
-  border: 1px solid #333;
+  border: 1px solid #9d762f;
   border-radius: 14px;
   background: #0b0b0b;
   color: #eee;
   padding: 0;
-  width: min(94vw, 620px);
-  box-shadow: 0 30px 100px #000;
+  width: min(94vw, 720px);
+  box-shadow:
+    0 0 0 3px #241a0d,
+    0 0 0 4px #d0a34b66,
+    0 30px 100px #000;
 }
 dialog::backdrop {
   background: #000c;
@@ -221,12 +252,57 @@ input[type="text"],
   padding: 11px;
   margin-bottom: 13px;
 }
-.tools {
+.toolRows {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.toolRow {
   display: flex;
-  gap: 7px;
   align-items: center;
-  margin-bottom: 12px;
+  gap: 8px;
   flex-wrap: wrap;
+}
+.primaryTools button {
+  min-width: 112px;
+  font-weight: 700;
+}
+.toolIcon {
+  display: inline-grid;
+  place-items: center;
+  width: 20px;
+  font-size: 18px;
+  line-height: 1;
+}
+.primaryTools .active {
+  border-color: #e0b357;
+  color: #fff4d6;
+  background: linear-gradient(180deg, #39260e, #1c1409);
+  box-shadow: inset 0 0 10px #d9a44220;
+}
+.colorControl {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.brushControl {
+  display: grid;
+  grid-template-columns: auto minmax(130px, 1fr) 42px;
+  align-items: center;
+  gap: 9px;
+  min-width: min(100%, 290px);
+  padding: 7px 10px;
+  border: 1px solid #383024;
+  border-radius: 8px;
+  background: #11100d;
+}
+#brushSize {
+  accent-color: #d7a847;
+  width: 100%;
+}
+#brushValue {
+  color: #e5c77e;
+  text-align: right;
 }
 #color {
   width: 44px;
@@ -238,9 +314,9 @@ input[type="text"],
 }
 #pixelCanvas {
   display: block;
-  width: min(100%, 512px);
+  width: min(100%, 560px);
   aspect-ratio: 1;
-  border: 1px solid #444;
+  border: 1px solid #765927;
   background: repeating-conic-gradient(#171717 0 25%, #202020 0 50%) 0/16px 16px;
   image-rendering: pixelated;
   touch-action: none;
@@ -249,6 +325,53 @@ input[type="text"],
   -webkit-user-select: none;
   -webkit-touch-callout: none;
   margin: auto;
+}
+.canvasFrame {
+  position: relative;
+  width: min(100%, 596px);
+  margin: auto;
+  padding: 12px;
+  border: 2px solid #be9140;
+  outline: 1px solid #4b3516;
+  background: linear-gradient(
+    135deg,
+    #2c1d0d,
+    #080706 18%,
+    #080706 82%,
+    #2c1d0d
+  );
+  box-shadow:
+    inset 0 0 0 3px #0c0905,
+    inset 0 0 0 5px #8f692d,
+    0 10px 35px #000b,
+    0 0 18px #bd8d2f1c;
+}
+.canvasFrame::before,
+.canvasFrame::after {
+  content: "◆";
+  position: absolute;
+  z-index: 2;
+  color: #e0b45c;
+  background: #0b0805;
+  font-size: 13px;
+  line-height: 18px;
+  width: 18px;
+  height: 18px;
+  text-align: center;
+}
+.canvasFrame::before {
+  left: -9px;
+  top: -9px;
+}
+.canvasFrame::after {
+  right: -9px;
+  bottom: -9px;
+}
+.hint {
+  width: min(100%, 596px);
+  margin: 10px auto 0;
+  text-align: left;
+  line-height: 1.45;
 }
 .actions {
   display: flex;
@@ -327,11 +450,39 @@ input[type="text"],
   #name {
     margin-bottom: 9px;
   }
-  .tools {
+  .toolRows {
     margin-bottom: 8px;
   }
+  .toolRow {
+    gap: 6px;
+  }
+  .primaryTools button {
+    min-width: 0;
+    flex: 1;
+    padding-inline: 7px;
+  }
+  .colorControl {
+    width: 52px;
+  }
+  .colorControl span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+  }
+  .secondaryTools .brushControl {
+    flex-basis: 100%;
+  }
+  .secondaryTools button {
+    flex: 1;
+  }
+  .canvasFrame {
+    width: min(100%, calc(100dvh - 380px));
+    min-width: 220px;
+    padding: 9px;
+  }
   #pixelCanvas {
-    width: min(100%, calc(100dvh - 315px));
+    width: 100%;
     min-width: 220px;
   }
   .hint {
