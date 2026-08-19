@@ -10,7 +10,7 @@ import {
   query,
   orderBy,
   limit,
-} from "../firebase.js?v=6";
+} from "../firebase.js?v=11";
 
 window.addEventListener("pageshow", (event) => {
   if (event.persisted) window.location.reload();
@@ -48,8 +48,39 @@ onAuthStateChanged(auth, async (user) => {
   dashboard.hidden = false;
   document.querySelector("#adminName").textContent =
     user.displayName || user.email;
-  await loadLogs();
+  await Promise.all([loadLogs(), loadArchives()]);
 });
+async function loadArchives() {
+  const grid = document.querySelector("#archiveGrid");
+  try {
+    const response = await fetch(`../archiv/index.json?v=${Date.now()}`);
+    if (!response.ok) throw new Error("Archiv nicht erreichbar");
+    const archives = await response.json();
+    grid.replaceChildren();
+    archives.forEach((archive) => {
+      const card = document.createElement("a");
+      card.className = "archiveCard";
+      card.href = `../archiv/${archive.file}`;
+      card.target = "_blank";
+      card.rel = "noopener";
+      const image = document.createElement("img");
+      image.src = card.href;
+      image.alt = `Archivierte Gästebuch-Wand ${archive.label}`;
+      const text = document.createElement("div");
+      const title = document.createElement("strong");
+      title.textContent = archive.label;
+      const meta = document.createElement("span");
+      meta.textContent = `${archive.entries} Kunstwerke · PNG öffnen`;
+      text.append(title, meta);
+      card.append(image, text);
+      grid.append(card);
+    });
+    if (!archives.length) grid.textContent = "Noch keine Monatsarchive vorhanden.";
+    document.querySelector("#archiveCount").textContent = `${archives.length} ${archives.length === 1 ? "Archiv" : "Archive"}`;
+  } catch {
+    grid.textContent = "Das Archiv konnte nicht geladen werden.";
+  }
+}
 async function loadLogs() {
   try {
     const [logsSnap, entriesSnap] = await Promise.all([
