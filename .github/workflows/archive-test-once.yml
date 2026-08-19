@@ -1,0 +1,35 @@
+name: Einmaliger Testexport und Reset
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/archive-test-once.yml"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: monthly-wall-archive
+  cancel-in-progress: false
+
+jobs:
+  archive:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Test-PNG erzeugen und Wand zurücksetzen
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: node scripts/monthly-archive.mjs --force
+      - name: Archiv veröffentlichen und Testworkflow entfernen
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git rm .github/workflows/archive-test-once.yml
+          git add docs/archiv public/archiv
+          git commit -m "Testarchiv erstellen und Wand zurücksetzen"
+          git push
