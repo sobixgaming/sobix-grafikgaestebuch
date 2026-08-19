@@ -17,12 +17,18 @@ const ADMIN_EMAIL = "domy.oneplus@gmail.com",
   dashboard = document.querySelector("#dashboard"),
   message = document.querySelector("#message");
 document.querySelector("#loginButton").onclick = () =>
-  signInWithPopup(auth, provider).catch(
-    () => (message.textContent = "Anmeldung fehlgeschlagen."),
-  );
+  signInWithPopup(auth, provider).catch((error) => {
+    console.error("Firebase login failed", error);
+    message.textContent = `Anmeldung fehlgeschlagen: ${error.code || "unbekannter-fehler"}`;
+  });
 document.querySelector("#switchAccount").onclick = async () => {
-  await signOut(auth);
-  await signInWithPopup(auth, provider);
+  try {
+    await signOut(auth);
+    await signInWithPopup(auth, provider);
+  } catch (error) {
+    console.error("Firebase account switch failed", error);
+    message.textContent = `Anmeldung fehlgeschlagen: ${error.code || "unbekannter-fehler"}`;
+  }
 };
 document.querySelector("#logoutButton").onclick = () => signOut(auth);
 onAuthStateChanged(auth, async (user) => {
