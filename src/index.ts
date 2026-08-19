@@ -32,7 +32,7 @@ export default {
         const name = typeof body.name === "string" ? body.name.trim() : "";
         const x = Number(body.x), y = Number(body.y);
         if (!name || name.length > 32 || !/^[\p{L}\p{N} ._\-]+$/u.test(name)) return json({ error: "Bitte einen gültigen Namen mit maximal 32 Zeichen eingeben." }, 400);
-        if (!validPixels(body.pixels) || !Number.isInteger(x) || !Number.isInteger(y) || x < 0 || y < 0 || x > 4032 || y > 4032) return json({ error: "Ungültige Bild- oder Positionsdaten." }, 400);
+        if (!validPixels(body.pixels) || !Number.isInteger(x) || !Number.isInteger(y) || x < 0 || y < 0 || x > 1856 || y > 1016) return json({ error: "Ungültige Bild- oder Positionsdaten." }, 400);
         const createdAt = new Date().toISOString();
         const hash = await networkHash(request, env.RATE_LIMIT_SECRET);
         const id = crypto.randomUUID();
