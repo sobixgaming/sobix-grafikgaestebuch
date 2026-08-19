@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>Admin · Sobix Grafik-Gästebuch</title>
-    <link rel="stylesheet" href="admin.css?v=11" />
+    <link rel="stylesheet" href="admin.css?v=12" />
   </head>
   <body>
     <main>
@@ -43,24 +43,10 @@
           </div>
           <div id="archiveGrid" class="archiveGrid"></div>
         </section>
-        <div class="tableWrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Grafik</th>
-                <th>Künstlername</th>
-                <th>Google-Konto</th>
-                <th>Zeitpunkt</th>
-                <th>Position</th>
-                <th>Eintrags-ID</th>
-              </tr>
-            </thead>
-            <tbody id="logs"></tbody>
-          </table>
-        </div>
+        <div id="logGroups" class="logGroups"></div>
       </section>
       <p id="message"></p>
     </main>
-    <script type="module" src="admin.js?v=11"></script>
+    <script type="module" src="admin.js?v=12"></script>
   </body>
 </html>
