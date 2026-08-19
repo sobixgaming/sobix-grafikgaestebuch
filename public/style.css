@@ -163,6 +163,11 @@ button {
   padding: 10px 14px;
   border-radius: 8px;
   cursor: pointer;
+  touch-action: manipulation;
+}
+button:disabled {
+  cursor: wait;
+  opacity: 0.65;
 }
 button:hover,
 .active {
