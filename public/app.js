@@ -14,7 +14,7 @@ import {
   limit,
   writeBatch,
   serverTimestamp,
-} from "./firebase.js?v=15";
+} from "./firebase.js?v=16";
 
 const ART_SIZE = 128;
 const ART_PIXELS = ART_SIZE * ART_SIZE;
@@ -219,12 +219,26 @@ onAuthStateChanged(auth, (user) => {
   document.querySelector("#logout").hidden = !user;
 });
 document.querySelector("#logout").onclick = async () => {
+  const button = document.querySelector("#logout");
+  button.disabled = true;
+  button.textContent = "Wird abgemeldet …";
   try {
-    await signOut(auth);
+    await Promise.race([
+      signOut(auth),
+      new Promise((_, reject) =>
+        setTimeout(() => reject(new Error("Zeitüberschreitung")), 8000),
+      ),
+    ]);
+    currentUser = null;
+    document.querySelector("#userStatus").textContent = "Nicht angemeldet";
+    button.hidden = true;
     notify("Du wurdest abgemeldet.");
   } catch (error) {
     console.error("Firebase logout failed", error);
-    notify("Abmelden fehlgeschlagen. Bitte erneut versuchen.");
+    notify("Abmelden fehlgeschlagen oder Zeitüberschreitung. Bitte Seite neu laden.");
+  } finally {
+    button.disabled = false;
+    button.textContent = "Abmelden";
   }
 };
 document.querySelector("#add").onclick = async () => {
