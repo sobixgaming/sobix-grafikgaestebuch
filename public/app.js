@@ -13,8 +13,14 @@ let pixels = Array(4096).fill(""),
   tool = "pen",
   drawing = false,
   pending = null,
-  preview = null;
+  preview = null,
+  history = [];
 ctx.imageSmoothingEnabled = false;
+function saveHistory() {
+  history.push([...pixels]);
+  if (history.length > 50) history.shift();
+  document.querySelector("#undo").disabled = false;
+}
 function draw() {
   ctx.clearRect(0, 0, 64, 64);
   pixels.forEach((c, i) => {
@@ -56,6 +62,7 @@ function paint(e) {
   draw();
 }
 canvas.addEventListener("pointerdown", (e) => {
+  saveHistory();
   drawing = tool !== "fill";
   canvas.setPointerCapture(e.pointerId);
   paint(e);
@@ -71,6 +78,8 @@ canvas.addEventListener("touchmove", (e) => e.preventDefault(), {
 });
 document.querySelector("#add").onclick = () => {
   pixels = Array(4096).fill("");
+  history = [];
+  document.querySelector("#undo").disabled = true;
   draw();
   nameInput.value = localStorage.getItem("guestName") || "";
   dialog.showModal();
@@ -84,10 +93,28 @@ document.querySelectorAll("[data-tool]").forEach(
         .forEach((x) => x.classList.toggle("active", x === b));
     }),
 );
+document.querySelector("#undo").onclick = () => {
+  const previous = history.pop();
+  if (!previous) return;
+  pixels = previous;
+  document.querySelector("#undo").disabled = history.length === 0;
+  draw();
+};
 document.querySelector("#clear").onclick = () => {
+  if (!pixels.some(Boolean)) return;
+  saveHistory();
   pixels.fill("");
   draw();
 };
+document.querySelector("#editorForm").addEventListener("submit", (e) => {
+  e.preventDefault();
+  if (e.submitter?.value === "cancel") dialog.close("cancel");
+});
+nameInput.addEventListener("keydown", (e) => {
+  if (e.key !== "Enter") return;
+  e.preventDefault();
+  nameInput.blur();
+});
 document.querySelector("#place").onclick = () => {
   if (!nameInput.reportValidity()) return;
   if (!pixels.some(Boolean)) return notify("Zeichne zuerst etwas.");
