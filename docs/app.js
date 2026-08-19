@@ -30,6 +30,7 @@ function berlinParts(date = new Date()) {
       month: "numeric",
       day: "numeric",
       hour: "numeric",
+      minute: "numeric",
       hourCycle: "h23",
       timeZoneName: "longOffset",
     })
@@ -56,9 +57,19 @@ function updateWallClock() {
   const parts = berlinParts(now);
   const year = Number(parts.year);
   const month = Number(parts.month);
-  const nextMonth = month === 12 ? 1 : month + 1;
-  const nextYear = month === 12 ? year + 1 : year;
-  const resetAt = berlinMidnightUtc(nextYear, nextMonth);
+  const beforeMonthlyReset = Number(parts.day) === 1 && Number(parts.hour) === 0 && Number(parts.minute) < 7;
+  let wallYear = year;
+  let wallMonth = month;
+  if (beforeMonthlyReset) {
+    wallMonth -= 1;
+    if (wallMonth === 0) {
+      wallMonth = 12;
+      wallYear -= 1;
+    }
+  }
+  const nextMonth = beforeMonthlyReset ? month : month === 12 ? 1 : month + 1;
+  const nextYear = beforeMonthlyReset ? year : month === 12 ? year + 1 : year;
+  const resetAt = berlinMidnightUtc(nextYear, nextMonth) + 7 * 60000;
   const remainingMinutes = Math.max(0, Math.ceil((resetAt - now.getTime()) / 60000));
   const days = Math.floor(remainingMinutes / 1440);
   const hours = Math.floor((remainingMinutes % 1440) / 60);
@@ -66,10 +77,17 @@ function updateWallClock() {
   document.querySelector("#currentMonth").textContent = new Intl.DateTimeFormat(
     "de-DE",
     { month: "long", year: "numeric", timeZone: WALL_TIME_ZONE },
-  ).format(now);
+  ).format(new Date(Date.UTC(wallYear, wallMonth - 1, 15)));
   document.querySelector("#resetDate").textContent = new Intl.DateTimeFormat(
     "de-DE",
-    { day: "2-digit", month: "2-digit", year: "numeric", timeZone: WALL_TIME_ZONE },
+    {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      timeZone: WALL_TIME_ZONE,
+    },
   ).format(new Date(resetAt));
   document.querySelector("#countdown").textContent = `${days} T · ${hours} Std · ${minutes} Min`;
 }
