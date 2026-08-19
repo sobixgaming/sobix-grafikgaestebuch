@@ -1,3 +1,21 @@
+import {
+  auth,
+  db,
+  provider,
+  signInWithPopup,
+  signOut,
+  onAuthStateChanged,
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  query,
+  orderBy,
+  limit,
+  writeBatch,
+  serverTimestamp,
+} from "./firebase.js";
+
 const wall = document.querySelector("#wall"),
   viewport = document.querySelector("#viewport"),
   empty = document.querySelector("#empty"),
@@ -8,7 +26,7 @@ const wall = document.querySelector("#wall"),
   nameInput = document.querySelector("#name"),
   placing = document.querySelector("#placing"),
   toast = document.querySelector("#toast");
-const demoMode = location.hostname.endsWith("github.io");
+let currentUser = null;
 let pixels = Array(4096).fill(""),
   tool = "pen",
   drawing = false,
@@ -76,12 +94,33 @@ canvas.addEventListener("touchstart", (e) => e.preventDefault(), {
 canvas.addEventListener("touchmove", (e) => e.preventDefault(), {
   passive: false,
 });
-document.querySelector("#add").onclick = () => {
+onAuthStateChanged(auth, (user) => {
+  currentUser = user;
+  document.querySelector("#userStatus").textContent = user
+    ? user.displayName || user.email
+    : "Nicht angemeldet";
+  document.querySelector("#logout").hidden = !user;
+});
+document.querySelector("#logout").onclick = () => signOut(auth);
+document.querySelector("#add").onclick = async () => {
+  if (!currentUser) {
+    try {
+      await signInWithPopup(auth, provider);
+    } catch (error) {
+      notify(
+        error.code === "auth/popup-closed-by-user"
+          ? "Anmeldung abgebrochen."
+          : "Google-Anmeldung fehlgeschlagen.",
+      );
+      return;
+    }
+  }
   pixels = Array(4096).fill("");
   history = [];
   document.querySelector("#undo").disabled = true;
   draw();
-  nameInput.value = localStorage.getItem("guestName") || "";
+  nameInput.value =
+    localStorage.getItem("guestName") || currentUser?.displayName || "";
   dialog.showModal();
 };
 document.querySelectorAll("[data-tool]").forEach(
@@ -148,11 +187,17 @@ function wallPoint(e) {
   return {
     x: Math.max(
       0,
-      Math.min(1856, Math.round((((e.clientX - r.left) * 1920) / r.width) / 8) * 8),
+      Math.min(
+        1856,
+        Math.round(((e.clientX - r.left) * 1920) / r.width / 8) * 8,
+      ),
     ),
     y: Math.max(
       0,
-      Math.min(1016, Math.round((((e.clientY - r.top) * 1080) / r.height) / 8) * 8),
+      Math.min(
+        1016,
+        Math.round(((e.clientY - r.top) * 1080) / r.height / 8) * 8,
+      ),
     ),
   };
 }
@@ -164,7 +209,10 @@ function fitWall() {
     wall.style.top = "";
     return;
   }
-  const scale = Math.min(viewport.clientWidth / 1920, viewport.clientHeight / 1080);
+  const scale = Math.min(
+    viewport.clientWidth / 1920,
+    viewport.clientHeight / 1080,
+  );
   wall.classList.add("fit-screen");
   wall.style.transform = `scale(${scale})`;
   wall.style.left = `${(viewport.clientWidth - 1920 * scale) / 2}px`;
@@ -183,34 +231,47 @@ wall.addEventListener("click", async (e) => {
   const payload = { ...pending, x, y };
   stopPlace();
   try {
-    if (demoMode) {
-      const today = new Date().toISOString().slice(0, 10);
-      const daily = JSON.parse(localStorage.getItem("guestDailyCount") || "{}");
-      const usedToday = Number(daily[today] || 0);
-      if (usedToday >= 100)
-        throw new Error("Das vorübergehende Limit von 100 Einträgen pro Tag ist erreicht.");
-      const entry = {
-        ...payload,
-        id: crypto.randomUUID(),
-        created_at: new Date().toISOString(),
-      };
-      const saved = JSON.parse(localStorage.getItem("demoEntries") || "[]");
-      saved.push(entry);
-      localStorage.setItem("demoEntries", JSON.stringify(saved));
-      daily[today] = usedToday + 1;
-      localStorage.setItem("guestDailyCount", JSON.stringify(daily));
-      render(entry);
-      notify("Demo-Eintrag in diesem Browser gespeichert.");
-      return;
-    }
-    const res = await fetch("api/entries", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify(payload),
-      }),
-      data = await res.json();
-    if (!res.ok) throw new Error(data.error);
-    render(data.entry);
+    if (!currentUser) throw new Error("Bitte erneut anmelden.");
+    const today = new Date().toISOString().slice(0, 10);
+    const entryRef = doc(collection(db, "entries"));
+    const logRef = doc(db, "logs", entryRef.id);
+    const limitRef = doc(db, "limits", `${currentUser.uid}_${today}`);
+    const limitSnap = await getDoc(limitRef);
+    const used = limitSnap.exists() ? Number(limitSnap.data().count || 0) : 0;
+    if (used >= 100)
+      throw new Error(
+        "Das vorübergehende Limit von 100 Einträgen pro Tag ist erreicht.",
+      );
+    const batch = writeBatch(db);
+    batch.set(entryRef, {
+      name: payload.name,
+      pixels: payload.pixels,
+      x,
+      y,
+      createdAt: serverTimestamp(),
+    });
+    batch.set(logRef, {
+      entryId: entryRef.id,
+      limitId: limitRef.id,
+      uid: currentUser.uid,
+      email: currentUser.email || "",
+      accountName: currentUser.displayName || "",
+      artistName: payload.name,
+      x,
+      y,
+      createdAt: serverTimestamp(),
+    });
+    batch.set(limitRef, {
+      uid: currentUser.uid,
+      count: used + 1,
+      updatedAt: serverTimestamp(),
+    });
+    await batch.commit();
+    render({
+      ...payload,
+      id: entryRef.id,
+      created_at: new Date().toISOString(),
+    });
     notify("Eintrag veröffentlicht. Danke!");
   } catch (err) {
     notify(err.message || "Speichern fehlgeschlagen.");
@@ -241,16 +302,22 @@ function notify(message) {
 }
 async function load() {
   try {
-    if (demoMode) {
-      JSON.parse(localStorage.getItem("demoEntries") || "[]")
-        .filter((e) => e.x <= 1856 && e.y <= 1016)
-        .forEach(render);
-      notify("Demomodus: Einträge bleiben nur in diesem Browser.");
-    } else {
-      const r = await fetch("api/entries"),
-        d = await r.json();
-      d.entries.forEach(render);
-    }
+    const snapshot = await getDocs(
+      query(
+        collection(db, "entries"),
+        orderBy("createdAt", "asc"),
+        limit(1000),
+      ),
+    );
+    snapshot.forEach((item) => {
+      const data = item.data();
+      render({
+        id: item.id,
+        ...data,
+        created_at:
+          data.createdAt?.toDate?.().toISOString() || new Date().toISOString(),
+      });
+    });
     fitWall();
     viewport.scrollTo(0, 0);
   } catch {
