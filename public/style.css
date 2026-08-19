@@ -173,22 +173,38 @@ button:hover,
 }
 .entry {
   cursor: help;
+  isolation: isolate;
 }
 .entry:hover {
-  outline: 1px solid #fff;
-  z-index: 2;
+  outline: 2px solid #fff;
+  box-shadow: 0 0 14px #ffffff80;
+  z-index: 16;
+}
+.entry canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
 }
 .entry::after {
   content: attr(data-label);
   display: none;
   position: absolute;
-  left: 0;
+  left: 50%;
   bottom: calc(100% + 6px);
+  transform: translateX(-50%);
   white-space: nowrap;
-  background: #fff;
-  color: #000;
-  padding: 5px 7px;
-  font-size: 11px;
+  background: #080808ee;
+  color: #fff;
+  border: 1px solid #fff;
+  border-radius: 6px;
+  padding: 7px 11px;
+  font-size: 16px;
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: 0.01em;
+  text-shadow: 0 1px 4px #000;
+  box-shadow: 0 5px 18px #000c;
 }
 .entry:hover::after {
   display: block;
