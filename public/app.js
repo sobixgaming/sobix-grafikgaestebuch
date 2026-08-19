@@ -14,7 +14,7 @@ import {
   limit,
   writeBatch,
   serverTimestamp,
-} from "./firebase.js?v=6";
+} from "./firebase.js?v=7";
 
 const ART_SIZE = 128;
 const ART_PIXELS = ART_SIZE * ART_SIZE;
@@ -204,6 +204,8 @@ document.querySelector("#place").onclick = () => {
   preview = document.createElement("canvas");
   preview.width = preview.height = ART_SIZE;
   preview.className = "placement-preview";
+  preview.style.width = `${ART_SIZE}px`;
+  preview.style.height = `${ART_SIZE}px`;
   const pc = preview.getContext("2d");
   pixels.forEach((v, i) => {
     if (v) {
@@ -325,6 +327,8 @@ function render(entry) {
   const size = Math.round(Math.sqrt(values.length));
   c.width = c.height = size;
   c.className = "entry";
+  c.style.width = `${size}px`;
+  c.style.height = `${size}px`;
   c.style.left = `${entry.x}px`;
   c.style.top = `${entry.y}px`;
   const d = new Date(entry.created_at).toLocaleString("de-DE");
