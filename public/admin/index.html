@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Admin · Sobix Grafik-Gästebuch</title>
+    <link rel="stylesheet" href="admin.css" />
+  </head>
+  <body>
+    <main>
+      <header>
+        <div>
+          <p class="eyebrow">Sobix Grafik-Gästebuch</p>
+          <h1>Admin-Protokoll</h1>
+        </div>
+        <a href="../">Zurück zum Gästebuch</a>
+      </header>
+      <section id="login">
+        <h2>Admin-Anmeldung</h2>
+        <p>Melde dich mit dem freigeschalteten Google-Konto an.</p>
+        <button id="loginButton">Mit Google anmelden</button>
+      </section>
+      <section id="denied" hidden>
+        <h2>Zugriff verweigert</h2>
+        <p>Dieses Google-Konto ist nicht als Admin freigeschaltet.</p>
+        <button id="switchAccount">Anderes Konto verwenden</button>
+      </section>
+      <section id="dashboard" hidden>
+        <div class="toolbar">
+          <p id="adminName"></p>
+          <button id="logoutButton">Abmelden</button>
+        </div>
+        <div class="stats">
+          <strong id="count">0</strong><span>protokollierte Einträge</span>
+        </div>
+        <div class="tableWrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Grafik</th>
+                <th>Künstlername</th>
+                <th>Google-Konto</th>
+                <th>Zeitpunkt</th>
+                <th>Position</th>
+                <th>Eintrags-ID</th>
+              </tr>
+            </thead>
+            <tbody id="logs"></tbody>
+          </table>
+        </div>
+      </section>
+      <p id="message"></p>
+    </main>
+    <script type="module" src="admin.js"></script>
+  </body>
+</html>
