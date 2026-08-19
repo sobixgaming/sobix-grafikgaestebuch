@@ -2,6 +2,10 @@
 
 Eine gemeinsame 4096×4096-Pixelfläche mit integriertem 64×64-Pixel-Editor. Besucher geben einen Namen ein und dürfen pro UTC-Kalendertag und Netzwerkkennung einen Eintrag erstellen.
 
+## Testversion
+
+Die GitHub-Pages-Version läuft ohne Backend. Einträge werden dort nur im jeweiligen Browser gespeichert und sind nicht für andere Besucher sichtbar. Die gemeinsame Version mit Admin-Protokoll benötigt weiterhin das Worker-/D1-Backend.
+
 ## Technik
 
 - Cloudflare Worker für Website und API
