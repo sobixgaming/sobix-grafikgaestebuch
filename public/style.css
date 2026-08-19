@@ -90,6 +90,30 @@ button:hover,
   font-weight: 700;
   white-space: nowrap;
 }
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.headerActions #userStatus {
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #888;
+  font-size: 11px;
+}
+.adminLink {
+  color: #aaa;
+  text-decoration: none;
+  border: 1px solid #343434;
+  border-radius: 8px;
+  padding: 9px 12px;
+}
+.adminLink:hover {
+  color: #fff;
+  border-color: #666;
+}
 #viewport {
   position: fixed;
   inset: 92px 0 0;
@@ -277,6 +301,11 @@ input[type="text"],
   .brand p {
     font-size: 11px;
     max-width: 270px;
+  }
+  .headerActions #userStatus,
+  .adminLink,
+  #logout {
+    display: none;
   }
   #viewport {
     inset: 92px 0 0;
