@@ -14,7 +14,7 @@ import {
   limit,
   writeBatch,
   serverTimestamp,
-} from "./firebase.js";
+} from "./firebase.js?v=4";
 
 const wall = document.querySelector("#wall"),
   viewport = document.querySelector("#viewport"),
