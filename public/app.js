@@ -14,7 +14,7 @@ import {
   limit,
   writeBatch,
   serverTimestamp,
-} from "./firebase.js?v=16";
+} from "./firebase.js?v=17";
 
 const ART_SIZE = 128;
 const ART_PIXELS = ART_SIZE * ART_SIZE;
@@ -213,10 +213,13 @@ brushSizeInput.addEventListener("input", () => {
 });
 onAuthStateChanged(auth, (user) => {
   currentUser = user;
+  const logoutButton = document.querySelector("#logout");
   document.querySelector("#userStatus").textContent = user
     ? `Angemeldet als: ${user.displayName || user.email}`
     : "Nicht angemeldet";
-  document.querySelector("#logout").hidden = !user;
+  logoutButton.hidden = !user;
+  if (user) logoutButton.style.removeProperty("display");
+  else logoutButton.style.setProperty("display", "none", "important");
 });
 document.querySelector("#logout").onclick = async () => {
   const button = document.querySelector("#logout");
@@ -232,6 +235,7 @@ document.querySelector("#logout").onclick = async () => {
     currentUser = null;
     document.querySelector("#userStatus").textContent = "Nicht angemeldet";
     button.hidden = true;
+    button.style.setProperty("display", "none", "important");
     notify("Du wurdest abgemeldet.");
   } catch (error) {
     console.error("Firebase logout failed", error);
