@@ -14,7 +14,12 @@ import {
   limit,
   writeBatch,
   serverTimestamp,
-} from "./firebase.js?v=5";
+} from "./firebase.js?v=6";
+
+const ART_SIZE = 128;
+const ART_PIXELS = ART_SIZE * ART_SIZE;
+const MAX_X = 1920 - ART_SIZE;
+const MAX_Y = 1080 - ART_SIZE;
 
 window.addEventListener("pageshow", (event) => {
   if (event.persisted) window.location.reload();
@@ -27,12 +32,15 @@ const wall = document.querySelector("#wall"),
   canvas = document.querySelector("#pixelCanvas"),
   ctx = canvas.getContext("2d"),
   color = document.querySelector("#color"),
+  brushSizeInput = document.querySelector("#brushSize"),
+  brushValue = document.querySelector("#brushValue"),
   nameInput = document.querySelector("#name"),
   placing = document.querySelector("#placing"),
   toast = document.querySelector("#toast");
 let currentUser = null;
-let pixels = Array(4096).fill(""),
+let pixels = Array(ART_PIXELS).fill(""),
   tool = "pen",
+  brushSize = 1,
   drawing = false,
   pending = null,
   preview = null,
@@ -44,11 +52,11 @@ function saveHistory() {
   document.querySelector("#undo").disabled = false;
 }
 function draw() {
-  ctx.clearRect(0, 0, 64, 64);
+  ctx.clearRect(0, 0, ART_SIZE, ART_SIZE);
   pixels.forEach((c, i) => {
     if (c) {
       ctx.fillStyle = c;
-      ctx.fillRect(i % 64, Math.floor(i / 64), 1, 1);
+      ctx.fillRect(i % ART_SIZE, Math.floor(i / ART_SIZE), 1, 1);
     }
   });
 }
@@ -57,22 +65,35 @@ function point(e) {
   return [
     Math.max(
       0,
-      Math.min(63, Math.floor(((e.clientX - r.left) * 64) / r.width)),
+      Math.min(
+        ART_SIZE - 1,
+        Math.floor(((e.clientX - r.left) * ART_SIZE) / r.width),
+      ),
     ),
     Math.max(
       0,
-      Math.min(63, Math.floor(((e.clientY - r.top) * 64) / r.height)),
+      Math.min(
+        ART_SIZE - 1,
+        Math.floor(((e.clientY - r.top) * ART_SIZE) / r.height),
+      ),
     ),
   ];
 }
 function flood(x, y, replacement) {
-  const target = pixels[y * 64 + x];
+  const target = pixels[y * ART_SIZE + x];
   if (target === replacement) return;
   const stack = [[x, y]];
   while (stack.length) {
     const [a, b] = stack.pop(),
-      i = b * 64 + a;
-    if (a < 0 || a > 63 || b < 0 || b > 63 || pixels[i] !== target) continue;
+      i = b * ART_SIZE + a;
+    if (
+      a < 0 ||
+      a >= ART_SIZE ||
+      b < 0 ||
+      b >= ART_SIZE ||
+      pixels[i] !== target
+    )
+      continue;
     pixels[i] = replacement;
     stack.push([a - 1, b], [a + 1, b], [a, b - 1], [a, b + 1]);
   }
@@ -80,7 +101,18 @@ function flood(x, y, replacement) {
 function paint(e) {
   const [x, y] = point(e);
   if (tool === "fill") flood(x, y, color.value);
-  else pixels[y * 64 + x] = tool === "eraser" ? "" : color.value;
+  else {
+    const replacement = tool === "eraser" ? "" : color.value;
+    const start = -Math.floor((brushSize - 1) / 2);
+    for (let dy = start; dy < start + brushSize; dy++) {
+      for (let dx = start; dx < start + brushSize; dx++) {
+        const px = x + dx,
+          py = y + dy;
+        if (px >= 0 && px < ART_SIZE && py >= 0 && py < ART_SIZE)
+          pixels[py * ART_SIZE + px] = replacement;
+      }
+    }
+  }
   draw();
 }
 canvas.addEventListener("pointerdown", (e) => {
@@ -97,6 +129,10 @@ canvas.addEventListener("touchstart", (e) => e.preventDefault(), {
 });
 canvas.addEventListener("touchmove", (e) => e.preventDefault(), {
   passive: false,
+});
+brushSizeInput.addEventListener("input", () => {
+  brushSize = Number(brushSizeInput.value);
+  brushValue.value = `${brushSize} px`;
 });
 onAuthStateChanged(auth, (user) => {
   currentUser = user;
@@ -120,7 +156,7 @@ document.querySelector("#add").onclick = async () => {
       return;
     }
   }
-  pixels = Array(4096).fill("");
+  pixels = Array(ART_PIXELS).fill("");
   history = [];
   document.querySelector("#undo").disabled = true;
   draw();
@@ -166,13 +202,13 @@ document.querySelector("#place").onclick = () => {
   pending = { name: nameInput.value.trim(), pixels: JSON.stringify(pixels) };
   dialog.close();
   preview = document.createElement("canvas");
-  preview.width = preview.height = 64;
+  preview.width = preview.height = ART_SIZE;
   preview.className = "placement-preview";
   const pc = preview.getContext("2d");
   pixels.forEach((v, i) => {
     if (v) {
       pc.fillStyle = v;
-      pc.fillRect(i % 64, Math.floor(i / 64), 1, 1);
+      pc.fillRect(i % ART_SIZE, Math.floor(i / ART_SIZE), 1, 1);
     }
   });
   wall.append(preview);
@@ -193,14 +229,14 @@ function wallPoint(e) {
     x: Math.max(
       0,
       Math.min(
-        1856,
+        MAX_X,
         Math.round(((e.clientX - r.left) * 1920) / r.width / 8) * 8,
       ),
     ),
     y: Math.max(
       0,
       Math.min(
-        1016,
+        MAX_Y,
         Math.round(((e.clientY - r.top) * 1080) / r.height / 8) * 8,
       ),
     ),
@@ -285,17 +321,19 @@ wall.addEventListener("click", async (e) => {
 function render(entry) {
   empty.hidden = true;
   const c = document.createElement("canvas");
-  c.width = c.height = 64;
+  const values = JSON.parse(entry.pixels);
+  const size = Math.round(Math.sqrt(values.length));
+  c.width = c.height = size;
   c.className = "entry";
   c.style.left = `${entry.x}px`;
   c.style.top = `${entry.y}px`;
   const d = new Date(entry.created_at).toLocaleString("de-DE");
   c.dataset.label = `${entry.name} · ${d}`;
   const cx = c.getContext("2d");
-  JSON.parse(entry.pixels).forEach((v, i) => {
+  values.forEach((v, i) => {
     if (v) {
       cx.fillStyle = v;
-      cx.fillRect(i % 64, Math.floor(i / 64), 1, 1);
+      cx.fillRect(i % size, Math.floor(i / size), 1, 1);
     }
   });
   wall.append(c);
