@@ -8,7 +8,7 @@
       content="Ein gemeinsames Grafikgästebuch aus 128×128 Pixelbildern"
     />
     <title>Sobix Grafik-Gästebuch</title>
-    <link rel="stylesheet" href="style.css?v=13" />
+    <link rel="stylesheet" href="style.css?v=14" />
   </head>
   <body>
     <header>
@@ -21,7 +21,10 @@
         <div class="wallMeta" aria-label="Laufzeit der aktuellen Wand">
           <div><span>Aktuelle Wand</span><strong id="currentMonth">–</strong></div>
           <div><span>Nächster Reset</span><strong id="resetDate">–</strong></div>
-          <div><span>Verbleibende Zeit</span><strong id="countdown">–</strong></div>
+          <div class="countdownCard">
+            <span>Verbleibende Zeit</span><strong id="countdown">–</strong
+            ><small>TAGE : STUNDEN : MINUTEN : SEKUNDEN</small>
+          </div>
         </div>
       </div>
       <div class="headerActions">
@@ -111,6 +114,6 @@
       ><button id="cancelPlace">Abbrechen</button>
     </div>
     <div id="toast" role="status"></div>
-    <script type="module" src="app.js?v=12"></script>
+    <script type="module" src="app.js?v=14"></script>
   </body>
 </html>
