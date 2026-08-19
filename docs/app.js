@@ -143,17 +143,43 @@ function stopPlace() {
   placing.classList.remove("show");
   wall.style.cursor = "";
 }
+function wallPoint(e) {
+  const r = wall.getBoundingClientRect();
+  return {
+    x: Math.max(
+      0,
+      Math.min(1856, Math.round((((e.clientX - r.left) * 1920) / r.width) / 8) * 8),
+    ),
+    y: Math.max(
+      0,
+      Math.min(1016, Math.round((((e.clientY - r.top) * 1080) / r.height) / 8) * 8),
+    ),
+  };
+}
+function fitWall() {
+  if (window.innerWidth < 900) {
+    wall.classList.remove("fit-screen");
+    wall.style.transform = "";
+    wall.style.left = "";
+    wall.style.top = "";
+    return;
+  }
+  const scale = Math.min(viewport.clientWidth / 1920, viewport.clientHeight / 1080);
+  wall.classList.add("fit-screen");
+  wall.style.transform = `scale(${scale})`;
+  wall.style.left = `${(viewport.clientWidth - 1920 * scale) / 2}px`;
+  wall.style.top = `${(viewport.clientHeight - 1080 * scale) / 2}px`;
+}
+window.addEventListener("resize", fitWall);
 wall.addEventListener("pointermove", (e) => {
   if (!preview) return;
-  const r = wall.getBoundingClientRect();
-  preview.style.left = `${Math.max(0, Math.min(1856, Math.round((e.clientX - r.left) / 8) * 8))}px`;
-  preview.style.top = `${Math.max(0, Math.min(1016, Math.round((e.clientY - r.top) / 8) * 8))}px`;
+  const { x, y } = wallPoint(e);
+  preview.style.left = `${x}px`;
+  preview.style.top = `${y}px`;
 });
 wall.addEventListener("click", async (e) => {
   if (!pending) return;
-  const r = wall.getBoundingClientRect(),
-    x = Math.max(0, Math.min(1856, Math.round((e.clientX - r.left) / 8) * 8)),
-    y = Math.max(0, Math.min(1016, Math.round((e.clientY - r.top) / 8) * 8));
+  const { x, y } = wallPoint(e);
   const payload = { ...pending, x, y };
   stopPlace();
   try {
@@ -225,6 +251,7 @@ async function load() {
         d = await r.json();
       d.entries.forEach(render);
     }
+    fitWall();
     viewport.scrollTo(0, 0);
   } catch {
     notify("Einträge konnten nicht geladen werden.");
