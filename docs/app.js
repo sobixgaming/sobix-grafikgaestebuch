@@ -132,10 +132,10 @@ wall.addEventListener("click", async (e) => {
   try {
     if (demoMode) {
       const today = new Date().toISOString().slice(0, 10);
-      if (localStorage.getItem("guestDay") === today)
-        throw new Error(
-          "In diesem Browser wurde heute bereits ein Eintrag erstellt.",
-        );
+      const daily = JSON.parse(localStorage.getItem("guestDailyCount") || "{}");
+      const usedToday = Number(daily[today] || 0);
+      if (usedToday >= 100)
+        throw new Error("Das vorübergehende Limit von 100 Einträgen pro Tag ist erreicht.");
       const entry = {
         ...payload,
         id: crypto.randomUUID(),
@@ -144,7 +144,8 @@ wall.addEventListener("click", async (e) => {
       const saved = JSON.parse(localStorage.getItem("demoEntries") || "[]");
       saved.push(entry);
       localStorage.setItem("demoEntries", JSON.stringify(saved));
-      localStorage.setItem("guestDay", today);
+      daily[today] = usedToday + 1;
+      localStorage.setItem("guestDailyCount", JSON.stringify(daily));
       render(entry);
       notify("Demo-Eintrag in diesem Browser gespeichert.");
       return;
