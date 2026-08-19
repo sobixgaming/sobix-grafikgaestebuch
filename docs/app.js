@@ -107,10 +107,11 @@ document.querySelector("#add").onclick = async () => {
     try {
       await signInWithPopup(auth, provider);
     } catch (error) {
+      console.error("Firebase login failed", error);
       notify(
         error.code === "auth/popup-closed-by-user"
           ? "Anmeldung abgebrochen."
-          : "Google-Anmeldung fehlgeschlagen.",
+          : `Google-Anmeldung fehlgeschlagen: ${error.code || "unbekannter-fehler"}`,
       );
       return;
     }
