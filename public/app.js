@@ -14,7 +14,11 @@ import {
   limit,
   writeBatch,
   serverTimestamp,
-} from "./firebase.js?v=4";
+} from "./firebase.js?v=5";
+
+window.addEventListener("pageshow", (event) => {
+  if (event.persisted) window.location.reload();
+});
 
 const wall = document.querySelector("#wall"),
   viewport = document.querySelector("#viewport"),
