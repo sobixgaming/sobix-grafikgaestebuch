@@ -1,0 +1,40 @@
+name: Monatsarchiv und Wand-Reset
+
+on:
+  schedule:
+    - cron: "7 * * * *"
+  workflow_dispatch:
+    inputs:
+      confirmation:
+        description: Zum manuellen Reset ARCHIVIEREN_UND_RESETTEN eingeben
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: monthly-wall-archive
+  cancel-in-progress: false
+
+jobs:
+  archive:
+    if: github.event_name == 'schedule' || inputs.confirmation == 'ARCHIVIEREN_UND_RESETTEN'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Wand archivieren und zurücksetzen
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: node scripts/monthly-archive.mjs ${{ github.event_name == 'workflow_dispatch' && '--force' || '' }}
+      - name: Neues Archiv veröffentlichen
+        run: |
+          if git diff --quiet; then exit 0; fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/archiv public/archiv
+          git commit -m "Monatsarchiv automatisch erstellen"
+          git push
