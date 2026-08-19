@@ -85,6 +85,66 @@ button {
 .stats span {
   color: #888;
 }
+.archiveSection {
+  margin: 30px 0;
+  padding: 22px;
+  border: 1px solid #8f692d;
+  border-radius: 14px;
+  background:
+    repeating-linear-gradient(135deg, transparent 0 12px, #d6a6470a 13px 14px),
+    #0b0906;
+  box-shadow: inset 0 0 25px #d5a23e0d;
+}
+.sectionHead {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+.sectionHead h2 {
+  margin-top: 4px;
+  font-size: 26px;
+}
+#archiveCount {
+  color: #d4ae63;
+}
+.archiveGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 14px;
+  color: #8e8a82;
+}
+.archiveCard {
+  overflow: hidden;
+  border: 1px solid #4f3b1b;
+  border-radius: 10px;
+  background: #080808;
+  color: #fff;
+  text-decoration: none;
+  transition: 0.18s ease;
+}
+.archiveCard:hover {
+  border-color: #dfb35a;
+  box-shadow: 0 0 18px #dca64230;
+  transform: translateY(-2px);
+}
+.archiveCard img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: contain;
+  background: #000;
+}
+.archiveCard div {
+  display: grid;
+  gap: 3px;
+  padding: 11px 13px;
+}
+.archiveCard span {
+  color: #a69a83;
+  font-size: 12px;
+}
 .tableWrap {
   overflow: auto;
   border: 1px solid #292929;
