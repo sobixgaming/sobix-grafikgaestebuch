@@ -10,7 +10,7 @@ import {
   query,
   orderBy,
   limit,
-} from "../firebase.js?v=5";
+} from "../firebase.js?v=6";
 
 window.addEventListener("pageshow", (event) => {
   if (event.persisted) window.location.reload();
@@ -71,13 +71,15 @@ async function loadLogs() {
         entry = entries.get(item.id),
         tr = document.createElement("tr"),
         preview = document.createElement("canvas");
-      preview.width = preview.height = 64;
       if (entry?.pixels) {
+        const values = JSON.parse(entry.pixels),
+          size = Math.round(Math.sqrt(values.length));
+        preview.width = preview.height = size;
         const ctx = preview.getContext("2d");
-        JSON.parse(entry.pixels).forEach((c, i) => {
+        values.forEach((c, i) => {
           if (c) {
             ctx.fillStyle = c;
-            ctx.fillRect(i % 64, Math.floor(i / 64), 1, 1);
+            ctx.fillRect(i % size, Math.floor(i / size), 1, 1);
           }
         });
       }
