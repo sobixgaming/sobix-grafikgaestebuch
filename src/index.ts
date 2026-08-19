@@ -36,13 +36,11 @@ export default {
         const createdAt = new Date().toISOString();
         const hash = await networkHash(request, env.RATE_LIMIT_SECRET);
         const id = crypto.randomUUID();
-        try {
-          await env.DB.prepare("INSERT INTO entries (id,name,pixels,position_x,position_y,created_at,network_hash,user_agent) VALUES (?,?,?,?,?,?,?,?)")
-            .bind(id, name, body.pixels, x, y, createdAt, hash, (request.headers.get("User-Agent") ?? "").slice(0, 300)).run();
-        } catch (error) {
-          if (String(error).includes("UNIQUE")) return json({ error: "Von deinem Anschluss wurde heute bereits ein Eintrag erstellt." }, 429);
-          throw error;
-        }
+        const daily = await env.DB.prepare("SELECT COUNT(*) AS count FROM entries WHERE network_hash = ? AND substr(created_at, 1, 10) = ?")
+          .bind(hash, createdAt.slice(0, 10)).first<{ count: number }>();
+        if ((daily?.count ?? 0) >= 100) return json({ error: "Das vorübergehende Limit von 100 Einträgen pro Tag ist erreicht." }, 429);
+        await env.DB.prepare("INSERT INTO entries (id,name,pixels,position_x,position_y,created_at,network_hash,user_agent) VALUES (?,?,?,?,?,?,?,?)")
+          .bind(id, name, body.pixels, x, y, createdAt, hash, (request.headers.get("User-Agent") ?? "").slice(0, 300)).run();
         console.log(JSON.stringify({ event: "entry_created", id, name, createdAt, networkHash: hash.slice(0, 12) }));
         return json({ entry: { id, name, pixels: body.pixels, x, y, created_at: createdAt } }, 201);
       }
