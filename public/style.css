@@ -516,7 +516,7 @@ input[type="text"],
 }
 @media (max-width: 600px) {
   header {
-    min-height: 230px;
+    min-height: 275px;
     align-items: stretch;
     flex-direction: column;
     justify-content: flex-start;
@@ -530,13 +530,8 @@ input[type="text"],
   .brand h1 {
     font-size: clamp(25px, 7.4vw, 34px);
   }
-  .headerActions #userStatus,
-  .adminLink,
-  #logout {
-    display: none;
-  }
   #viewport {
-    inset: 230px 0 0;
+    inset: 275px 0 0;
   }
   .wallMeta {
     gap: 5px;
@@ -555,6 +550,24 @@ input[type="text"],
   }
   .headerActions {
     justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 7px;
+  }
+  .headerActions #userStatus {
+    display: block;
+    flex-basis: 100%;
+    max-width: none;
+    color: #e7d7b5;
+    font-size: 12px;
+    text-align: right;
+  }
+  .adminLink,
+  #logout {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 38px;
+    padding: 8px 11px;
   }
   dialog {
     width: 96vw;
