@@ -14,7 +14,7 @@ import {
   limit,
   writeBatch,
   serverTimestamp,
-} from "./firebase.js?v=14";
+} from "./firebase.js?v=15";
 
 const ART_SIZE = 128;
 const ART_PIXELS = ART_SIZE * ART_SIZE;
@@ -218,7 +218,15 @@ onAuthStateChanged(auth, (user) => {
     : "Nicht angemeldet";
   document.querySelector("#logout").hidden = !user;
 });
-document.querySelector("#logout").onclick = () => signOut(auth);
+document.querySelector("#logout").onclick = async () => {
+  try {
+    await signOut(auth);
+    notify("Du wurdest abgemeldet.");
+  } catch (error) {
+    console.error("Firebase logout failed", error);
+    notify("Abmelden fehlgeschlagen. Bitte erneut versuchen.");
+  }
+};
 document.querySelector("#add").onclick = async () => {
   if (!currentUser) {
     try {
