@@ -105,6 +105,15 @@ button:hover,
   background-size: 32px 32px;
   box-shadow: 0 0 0 1px #222;
 }
+#wall.fit-screen {
+  position: absolute;
+  transform-origin: top left;
+}
+@media (min-width: 900px) {
+  #viewport {
+    overflow: hidden;
+  }
+}
 .entry,
 .placement-preview {
   position: absolute;
