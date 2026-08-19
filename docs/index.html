@@ -8,7 +8,7 @@
       content="Ein gemeinsames Grafikgästebuch aus 128×128 Pixelbildern"
     />
     <title>Sobix Grafik-Gästebuch</title>
-    <link rel="stylesheet" href="style.css?v=10" />
+    <link rel="stylesheet" href="style.css?v=11" />
   </head>
   <body>
     <header>
@@ -18,6 +18,11 @@
           Willkommen bei meinem virtuellen Gästebuch, gerne könnt ihr euch hier
           verewigen. Ich freu mich auf eure Kunstwerke.
         </p>
+        <div class="wallMeta" aria-label="Laufzeit der aktuellen Wand">
+          <div><span>Aktuelle Wand</span><strong id="currentMonth">–</strong></div>
+          <div><span>Nächster Reset</span><strong id="resetDate">–</strong></div>
+          <div><span>Verbleibende Zeit</span><strong id="countdown">–</strong></div>
+        </div>
       </div>
       <div class="headerActions">
         <span id="userStatus">Nicht angemeldet</span
@@ -106,6 +111,6 @@
       ><button id="cancelPlace">Abbrechen</button>
     </div>
     <div id="toast" role="status"></div>
-    <script type="module" src="app.js?v=10"></script>
+    <script type="module" src="app.js?v=11"></script>
   </body>
 </html>
