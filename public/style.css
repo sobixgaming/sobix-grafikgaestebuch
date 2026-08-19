@@ -144,12 +144,14 @@ button:hover,
   gap: 8px;
 }
 .headerActions #userStatus {
-  max-width: 180px;
+  max-width: 280px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  color: #888;
-  font-size: 11px;
+  color: #ddd;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
 }
 .adminLink {
   color: #aaa;
