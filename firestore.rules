@@ -16,9 +16,9 @@ service cloud.firestore {
         && request.resource.data.name.size() >= 1
         && request.resource.data.name.size() <= 32
         && request.resource.data.pixels is string
-        && request.resource.data.pixels.size() <= 70000
-        && request.resource.data.x is int && request.resource.data.x >= 0 && request.resource.data.x <= 1856
-        && request.resource.data.y is int && request.resource.data.y >= 0 && request.resource.data.y <= 1016
+        && request.resource.data.pixels.size() <= 200000
+        && request.resource.data.x is int && request.resource.data.x >= 0 && request.resource.data.x <= 1792
+        && request.resource.data.y is int && request.resource.data.y >= 0 && request.resource.data.y <= 952
         && request.resource.data.createdAt == request.time
         && existsAfter(/databases/$(database)/documents/logs/$(entryId));
       allow update: if false;
