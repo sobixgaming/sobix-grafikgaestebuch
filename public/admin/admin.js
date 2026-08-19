@@ -10,7 +10,11 @@ import {
   query,
   orderBy,
   limit,
-} from "../firebase.js?v=4";
+} from "../firebase.js?v=5";
+
+window.addEventListener("pageshow", (event) => {
+  if (event.persisted) window.location.reload();
+});
 const ADMIN_EMAIL = "domy.oneplus@gmail.com",
   login = document.querySelector("#login"),
   denied = document.querySelector("#denied"),
