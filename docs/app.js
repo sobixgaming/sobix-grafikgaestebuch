@@ -14,12 +14,68 @@ import {
   limit,
   writeBatch,
   serverTimestamp,
-} from "./firebase.js?v=10";
+} from "./firebase.js?v=11";
 
 const ART_SIZE = 128;
 const ART_PIXELS = ART_SIZE * ART_SIZE;
 const MAX_X = 1920 - ART_SIZE;
 const MAX_Y = 1080 - ART_SIZE;
+const WALL_TIME_ZONE = "Europe/Berlin";
+
+function berlinParts(date = new Date()) {
+  return Object.fromEntries(
+    new Intl.DateTimeFormat("en-CA", {
+      timeZone: WALL_TIME_ZONE,
+      year: "numeric",
+      month: "numeric",
+      day: "numeric",
+      hour: "numeric",
+      hourCycle: "h23",
+      timeZoneName: "longOffset",
+    })
+      .formatToParts(date)
+      .filter((part) => part.type !== "literal")
+      .map((part) => [part.type, part.value]),
+  );
+}
+
+function berlinMidnightUtc(year, month) {
+  const guess = new Date(Date.UTC(year, month - 1, 1));
+  const zone = berlinParts(guess).timeZoneName;
+  const match = zone.match(/GMT([+-])(\d{2}):(\d{2})/);
+  const offset = match
+    ? (match[1] === "+" ? 1 : -1) *
+      (Number(match[2]) * 60 + Number(match[3])) *
+      60000
+    : 0;
+  return Date.UTC(year, month - 1, 1) - offset;
+}
+
+function updateWallClock() {
+  const now = new Date();
+  const parts = berlinParts(now);
+  const year = Number(parts.year);
+  const month = Number(parts.month);
+  const nextMonth = month === 12 ? 1 : month + 1;
+  const nextYear = month === 12 ? year + 1 : year;
+  const resetAt = berlinMidnightUtc(nextYear, nextMonth);
+  const remainingMinutes = Math.max(0, Math.ceil((resetAt - now.getTime()) / 60000));
+  const days = Math.floor(remainingMinutes / 1440);
+  const hours = Math.floor((remainingMinutes % 1440) / 60);
+  const minutes = remainingMinutes % 60;
+  document.querySelector("#currentMonth").textContent = new Intl.DateTimeFormat(
+    "de-DE",
+    { month: "long", year: "numeric", timeZone: WALL_TIME_ZONE },
+  ).format(now);
+  document.querySelector("#resetDate").textContent = new Intl.DateTimeFormat(
+    "de-DE",
+    { day: "2-digit", month: "2-digit", year: "numeric", timeZone: WALL_TIME_ZONE },
+  ).format(new Date(resetAt));
+  document.querySelector("#countdown").textContent = `${days} T · ${hours} Std · ${minutes} Min`;
+}
+
+updateWallClock();
+setInterval(updateWallClock, 30000);
 
 window.addEventListener("pageshow", (event) => {
   if (event.persisted) window.location.reload();
