@@ -10,7 +10,7 @@ import {
   query,
   orderBy,
   limit,
-} from "../firebase.js";
+} from "../firebase.js?v=4";
 const ADMIN_EMAIL = "domy.oneplus@gmail.com",
   login = document.querySelector("#login"),
   denied = document.querySelector("#denied"),
