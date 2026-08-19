@@ -14,7 +14,7 @@ import {
   limit,
   writeBatch,
   serverTimestamp,
-} from "./firebase.js?v=11";
+} from "./firebase.js?v=14";
 
 const ART_SIZE = 128;
 const ART_PIXELS = ART_SIZE * ART_SIZE;
@@ -70,10 +70,11 @@ function updateWallClock() {
   const nextMonth = beforeMonthlyReset ? month : month === 12 ? 1 : month + 1;
   const nextYear = beforeMonthlyReset ? year : month === 12 ? year + 1 : year;
   const resetAt = berlinMidnightUtc(nextYear, nextMonth) + 7 * 60000;
-  const remainingMinutes = Math.max(0, Math.ceil((resetAt - now.getTime()) / 60000));
-  const days = Math.floor(remainingMinutes / 1440);
-  const hours = Math.floor((remainingMinutes % 1440) / 60);
-  const minutes = remainingMinutes % 60;
+  const remainingSeconds = Math.max(0, Math.floor((resetAt - now.getTime()) / 1000));
+  const days = Math.floor(remainingSeconds / 86400);
+  const hours = Math.floor((remainingSeconds % 86400) / 3600);
+  const minutes = Math.floor((remainingSeconds % 3600) / 60);
+  const seconds = remainingSeconds % 60;
   document.querySelector("#currentMonth").textContent = new Intl.DateTimeFormat(
     "de-DE",
     { month: "long", year: "numeric", timeZone: WALL_TIME_ZONE },
@@ -89,11 +90,13 @@ function updateWallClock() {
       timeZone: WALL_TIME_ZONE,
     },
   ).format(new Date(resetAt));
-  document.querySelector("#countdown").textContent = `${days} T · ${hours} Std · ${minutes} Min`;
+  document.querySelector("#countdown").textContent = [days, hours, minutes, seconds]
+    .map((value) => String(value).padStart(2, "0"))
+    .join(":");
 }
 
 updateWallClock();
-setInterval(updateWallClock, 30000);
+setInterval(updateWallClock, 1000);
 
 window.addEventListener("pageshow", (event) => {
   if (event.persisted) window.location.reload();
