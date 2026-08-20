@@ -14,7 +14,7 @@ import {
   limit,
   writeBatch,
   serverTimestamp,
-} from "./firebase.js?v=17";
+} from "./firebase.js?v=18";
 
 const ART_SIZE = 128;
 const ART_PIXELS = ART_SIZE * ART_SIZE;
@@ -382,8 +382,13 @@ wall.addEventListener("click", async (e) => {
     const entryRef = doc(collection(db, "entries"));
     const logRef = doc(db, "logs", entryRef.id);
     const limitRef = doc(db, "limits", `${currentUser.uid}_${today}`);
-    const limitSnap = await getDoc(limitRef);
-    const used = limitSnap.exists() ? Number(limitSnap.data().count || 0) : 0;
+    let used = 0;
+    try {
+      const limitSnap = await getDoc(limitRef);
+      used = limitSnap.exists() ? Number(limitSnap.data().count || 0) : 0;
+    } catch (error) {
+      if (error?.code !== "permission-denied") throw error;
+    }
     if (used >= 100)
       throw new Error(
         "Das vorübergehende Limit von 100 Einträgen pro Tag ist erreicht.",
